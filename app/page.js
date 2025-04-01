@@ -1,13 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react';
 
-// Коды ответа для проверки результата
-const SignResponseCode = {
-  Normal: 0,
-  Rejected: 1,
-  Failed: 2
-};
-
 export default function BinanceW3WChecker() {
   const [result, setResult] = useState('Checking...');
   const [isClient, setIsClient] = useState(false);
@@ -56,12 +49,12 @@ export default function BinanceW3WChecker() {
 
   const handleSign = async () => {
     if (!window.binancew3w?.pcs?.sign) {
-      alert('Sign function not available!');
+      setSignResult({ error: 'Sign function not available!' });
       return;
     }
 
     if (!inputs.binanceChainId || !inputs.contractAddress || !inputs.address) {
-      alert('Please fill all fields!');
+      setSignResult({ error: 'Please fill all fields!' });
       return;
     }
 
@@ -78,15 +71,9 @@ export default function BinanceW3WChecker() {
       console.log('Sign result:', result);
       setSignResult(result);
 
-      if (result.code === SignResponseCode.Normal && result.data) {
-        alert('Successfully signed!');
-      } else {
-        alert('Signing failed or rejected!');
-      }
     } catch (error) {
       console.error('Sign error:', error);
       setSignResult({ error: error.message });
-      alert('Error during signing: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -100,7 +87,7 @@ export default function BinanceW3WChecker() {
       marginTop: '50px',
       maxWidth: '600px',
       marginLeft: 'auto',
-      marginRight: 'auto'
+      marginRight: 'auto',
     }}>
       <h1>Binance Web3 Wallet Checker</h1>
       
@@ -168,7 +155,6 @@ export default function BinanceW3WChecker() {
           disabled={loading}
           style={{
             padding: '10px 20px',
-            backgroundColor: loading ? '#ccc' : '#f0b90b',
             color: 'white',
             border: 'none',
             borderRadius: '5px',
@@ -187,26 +173,24 @@ export default function BinanceW3WChecker() {
           padding: '20px',
           border: '1px solid #ddd',
           borderRadius: '8px',
-          backgroundColor: '#f9f9f9',
           textAlign: 'left'
         }}>
           <h3>Sign Result:</h3>
-          <pre style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-            {JSON.stringify(signResult, null, 2)}
-          </pre>
           
-          {signResult.code === SignResponseCode.Normal && signResult.data && (
-            <div style={{ marginTop: '15px' }}>
-              <p><strong>Signature:</strong> {signResult.data?.signature || 'N/A'}</p>
-              <p><strong>Expire At:</strong> {signResult.data?.expireAt || 'N/A'}</p>
+          {signResult.error ? (
+            <div style={{ color: 'red' }}>Error: {signResult.error}</div>
+          ) : signResult.code === "000000" ? (
+            <div>
+              <div><strong>Signature:</strong> {signResult.data?.signature || 'N/A'}</div>
+              <div><strong>Expire At:</strong> {signResult.data?.expireAt || 'N/A'}</div>
+            </div>
+          ) : (
+            <div style={{ color: 'orange' }}>
+              Code: {signResult.code} - {signResult.message || 'Unknown error'}
             </div>
           )}
         </div>
       )}
-      
-      <p style={{ marginTop: '30px', color: '#666' }}>
-        Check browser console for detailed debug information
-      </p>
     </div>
   );
 }
