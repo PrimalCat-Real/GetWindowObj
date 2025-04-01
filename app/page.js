@@ -43,7 +43,6 @@ export default function BinanceW3WChecker() {
       <div style={{
         margin: '30px auto',
         padding: '20px',
-        backgroundColor: '#f0f0f0',
         borderRadius: '8px',
         maxWidth: '600px',
         fontSize: '18px'
