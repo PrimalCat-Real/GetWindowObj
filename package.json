@@ -9,8 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@binance/w3w-rainbow-connector": "^1.1.6",
+    "@rainbow-me/rainbowkit": "^1.3.7",
+    "next": "15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.2.4"
+    "viem": "^1.21.4",
+    "wagmi": "^1.4.13"
   }
 }
