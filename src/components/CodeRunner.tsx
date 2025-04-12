@@ -87,7 +87,7 @@ export default function CodeRunner() {
       </div>
       <div className="border rounded-md p-4 bg-gray-50 dark:bg-gray-900">
         <h2 className="font-semibold mb-2">Вывод:</h2>
-        <pre className="whitespace-pre-wrap font-mono p-2 rounded min-h-20">
+        <pre className="whitespace-pre-wrap h-fit text-wrap flex flex-col text-start font-mono p-2 rounded min-h-20">
           {output}
         </pre>
       </div>
