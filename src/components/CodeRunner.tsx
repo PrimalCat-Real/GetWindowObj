@@ -1,76 +1,57 @@
-'use client';
+'use client'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-
-// Функция для безопасного преобразования объектов в строку (с обработкой циклических ссылок)
-const safeStringify = (obj: any): string => {
-  const seen = new WeakSet();
-  return JSON.stringify(obj, (key, value) => {
-    if (typeof value === 'object' && value !== null) {
-      if (seen.has(value)) return '[Circular]';
-      seen.add(value);
+// Функция для безопасного вывода объектов
+const formatOutput = (value: any): string => {
+  if (typeof value === 'function') {
+    return value.toString()
+  }
+  
+  const cache = new Set()
+  return JSON.stringify(value, (key, val) => {
+    if (typeof val === 'object' && val !== null) {
+      if (cache.has(val)) return '[Circular]'
+      cache.add(val)
     }
-    return value;
-  }, 2);
-};
+    return val
+  }, 2)
+}
 
 export default function CodeRunner() {
-  const [code, setCode] = useState<string>('');
-  const [output, setOutput] = useState<string>('Результат появится здесь...');
+  const [code, setCode] = useState('')
+  const [output, setOutput] = useState('Результат появится здесь...')
 
   const runCode = () => {
-    // Сохраняем оригинальные методы console
-    const originalConsole = {
-      log: console.log,
-      warn: console.warn,
-      error: console.error,
-      info: console.info
-    };
-    
-    let consoleOutput = '';
-    
-    // Перехватываем методы console
-    const interceptConsole = (method: 'log' | 'warn' | 'error' | 'info') => {
-      return (...args: any[]) => {
-        originalConsole[method](...args); // сохраняем оригинальный вывод
-        consoleOutput += `[${method}] ` + args.map(arg => 
-          typeof arg === 'object' ? safeStringify(arg) : String(arg)
-        ).join(' ') + '\n';
-      };
-    };
+    const originalConsole = { ...console }
+    let consoleOutput = ''
 
-    console.log = interceptConsole('log');
-    console.warn = interceptConsole('warn');
-    console.error = interceptConsole('error');
-    console.info = interceptConsole('info');
+    // Перехватываем console.log
+    console.log = (...args) => {
+      originalConsole.log(...args)
+      consoleOutput += args.map(arg => formatOutput(arg)).join(' ') + '\n'
+    }
 
     try {
-      setOutput('Выполнение...');
-      const result = eval(code);
+      setOutput('Выполнение...')
+      const result = eval(code)
       
-      // Добавляем результат выполнения (если не undefined)
       if (result !== undefined) {
-        consoleOutput += 'Результат: ' + 
-          (typeof result === 'object' ? safeStringify(result) : String(result));
+        consoleOutput += `Результат: ${formatOutput(result)}`
       }
       
-      setOutput(consoleOutput || 'Код выполнен (вывода нет)');
+      setOutput(consoleOutput || 'Код выполнен (вывода нет)')
     } catch (e) {
-      setOutput(`Ошибка: ${e instanceof Error ? e.message : String(e)}`);
+      setOutput(`Ошибка: ${e instanceof Error ? e.message : String(e)}`)
     } finally {
-      // Восстанавливаем оригинальные методы console
-      console.log = originalConsole.log;
-      console.warn = originalConsole.warn;
-      console.error = originalConsole.error;
-      console.info = originalConsole.info;
+      console.log = originalConsole.log
     }
-  };
+  }
 
   const clearOutput = () => {
-    setOutput('Результат появится здесь...');
-  };
+    setOutput('Результат появится здесь...')
+  }
 
   return (
     <div className="p-4 max-w-2xl mx-auto">
@@ -87,10 +68,10 @@ export default function CodeRunner() {
       </div>
       <div className="border rounded-md p-4 bg-gray-50 dark:bg-gray-900">
         <h2 className="font-semibold mb-2">Вывод:</h2>
-        <pre className="whitespace-pre-wrap h-fit text-wrap flex flex-col text-start font-mono p-2 rounded min-h-20">
+        <pre className="whitespace-pre-wrap font-mono p-2 rounded min-h-20">
           {output}
         </pre>
       </div>
     </div>
-  );
+  )
 }
