@@ -26,6 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import CodeRunner from '@/components/CodeRunner';
 
 interface BinanceW3W {
   pcs?: {
@@ -166,7 +167,7 @@ export default function BinanceW3WChecker() {
       header: 'Status',
       cell: ({ row }) => {
         const result = row.original;
-        if (result.error) {
+        if (result.error && result.code != '000000') {
           return <div className="text-red-500">Error</div>;
         } else if (result.code === '000000') {
           return <div className="text-green-500">Success</div>;
@@ -245,6 +246,7 @@ export default function BinanceW3WChecker() {
         ) : (
           <p>Loading client-side check...</p>
         )}
+        <CodeRunner></CodeRunner>
       </div>
 
       <div className='rounded-md border border-border p-4 flex flex-col gap-2 text-left text-sm'>
